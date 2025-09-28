@@ -1,0 +1,19 @@
+@startuml
+' ---- C4-PlantUML ----
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+LAYOUT_WITH_LEGEND()
+
+Person(user, "Usuário", "Envia perguntas via HTTP para o sistema.")
+System_Boundary(ps, "PromptShield API") {
+  System(ps_api, "PromptShield (FastAPI)", "Firewall semântico + orquestração do LLM.")
+}
+System_Ext(gemini, "Gemini API (Google GenAI)", "LLM para geração de respostas.")
+System_Ext(storage, "File System / Artefatos", "Datasets (HarmBench, PINT, JBB), modelos e logs.")
+
+Rel(user, ps_api, "HTTP /chat", "JSON/REST")
+Rel(ps_api, gemini, "generateContent()", "Google GenAI SDK")
+Rel(ps_api, storage, "lê/escreve datasets, modelos, logs", "FS")
+
+SHOW_LEGEND()
+@enduml
+

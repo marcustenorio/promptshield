@@ -1,0 +1,31 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+LAYOUT_WITH_LEGEND()
+
+Person(user, "Usuário")
+
+System_Boundary(ps, "PromptShield") {
+  Container(api, "FastAPI App", "Python/FastAPI", "Exposição de /health, /chat, logs.")
+  Container(decision, "DecisionEngine", "Python", "Agrega classificadores + Policy e define ALLOW/SANITIZE/BLOCK.")
+  Container(classifiers, "Classificadores", "Python", "Rule-based (regex) + SBERT (embeddings + cabeça calibrada).")
+  Container(sanitizer, "LLMSanitizer", "Python", "Sanitiza prompt quando necessário.")
+  Container(gemini_client, "GeminiClient", "Python - google-genai", "Adapter do LLM (generate_content).")
+  ContainerDb(data, "Data/Models/Logs", "File System", "datasets/raw|interim|processed, models/, logs/")
+}
+
+System_Ext(gemini, "Gemini API", "Google GenAI (v1)")
+
+Rel(user, api, "HTTP /chat")
+Rel(api, decision, "evaluate(message)")
+Rel(decision, classifiers, "predict()")
+Rel_Back(decision, api, "Decision + votos")
+Rel(api, sanitizer, "sanitize() [se necessário]")
+Rel(api, gemini_client, "gera resposta")
+Rel(gemini_client, gemini, "generateContent()")
+Rel(api, data, "logs + leitura/escrita")
+Rel(classifiers, data, "carrega artefatos (pesos/cabeças)")
+Rel(sanitizer, data, "pode registrar metadados")
+
+SHOW_LEGEND()
+@enduml
+
