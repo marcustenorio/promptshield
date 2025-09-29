@@ -1,3 +1,24 @@
+<p align="center">
+  <img src="docs/img/ime-logo.png" alt="IME" width="120"/>
+</p>
+
+<h1 align="center">🛡️ PromptShield</h1>
+
+<p align="center">
+  <strong>Firewall Semântico contra Prompt Injection em LLMs</strong>
+</p>
+
+---
+
+### 📚 Informações Acadêmicas
+
+- **Aluno:** Marcus Rogérius Nunes Tenório  
+- **Professor CEL:** Julio Cesar Duarte  
+- **Curso:** Pós-Graduação em Engenharia de Computação  
+- **Disciplina:** Aprendizado de Máquina  
+
+---
+
 ## 🛡️ PromptShield  
 
 **PromptShield** é um **firewall semântico para Large Language Models (LLMs)** projetado para detectar e mitigar ataques de **Prompt Injection**.  
