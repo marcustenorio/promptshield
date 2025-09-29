@@ -27,7 +27,7 @@ A taxonomia adotada é baseada no **OWASP LLM Top-10 (LLM01 – Prompt Injection
 
 ---
 
-##Estrutura de Pastas (DDD + Hexagonal)
+Estrutura de Pastas (DDD + Hexagonal)
 
 ```bash
 promptshield/
@@ -40,7 +40,7 @@ promptshield/
     ├── interim/           # Dados intermediários
     └── processed/         # Dataset v0.1 (normalizado)
 ```
-### Fluxo (Visão Geral)
+Fluxo (Visão Geral)
 ```mermaid
 flowchart LR
   user["Usuário"]
@@ -78,7 +78,7 @@ flowchart LR
   eng -.->|"scripts offline"| data
   api -.->|"auditoria"| logs
 ```
-### Sequência (/chat)
+Sequência (/chat)
 ```mermaid
 sequenceDiagram
   autonumber
