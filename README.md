@@ -1,6 +1,6 @@
 
 ### Fluxo (Visão Geral)
-```mermaid
+``` mermaid
   flowchart LR
     user["Usuário"]
     api["FastAPI App\n(src/infrastructure/web/app.py)"]
