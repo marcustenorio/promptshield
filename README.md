@@ -49,6 +49,8 @@ Firewall Semântico para prompts maliciosos, com integração ao **Gemini API**.
 ## 📊 Comunicação dos Scripts (Diagramas C4 simplificados)
 
 ### Fluxo (Visão Geral)
+### Fluxo (Visão Geral)
+```mermaid
 flowchart LR
   user["Usuário"]
   api["FastAPI App\n(src/infrastructure/web/app.py)"]
@@ -85,6 +87,8 @@ flowchart LR
   eng -.->|"scripts offline"| data
   api -.->|"auditoria"| logs
 
+### Sequência (/chat)
+```mermaid
 sequenceDiagram
   autonumber
   participant U as Usuário
