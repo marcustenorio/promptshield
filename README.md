@@ -5,7 +5,7 @@ O projeto segue **DDD (Domain-Driven Design)** e **Arquitetura Hexagonal**, gara
 
 ---
 
-## 📌 Objetivo  
+## Objetivo  
 Desenvolver um **middleware de segurança** que:  
 1. Intercepte prompts enviados a LLMs (ChatGPT, Gemini, LLaMA, Mistral etc.).  
 2. Classifique-os como **benignos** ou **maliciosos**.  
@@ -13,7 +13,7 @@ Desenvolver um **middleware de segurança** que:
 
 ---
 
-## 🔎 Taxonomia Inicial de Ataques  
+## Taxonomia Inicial de Ataques  
 
 A taxonomia adotada é baseada no **OWASP LLM Top-10 (LLM01 – Prompt Injection)** e benchmarks internacionais (HarmBench, PINT, JailbreakBench).  
 
@@ -27,7 +27,7 @@ A taxonomia adotada é baseada no **OWASP LLM Top-10 (LLM01 – Prompt Injection
 
 ---
 
-## 📂 Estrutura de Pastas (DDD + Hexagonal)
+## Estrutura de Pastas (DDD + Hexagonal)
 
 ```bash
 promptshield/
@@ -39,3 +39,50 @@ promptshield/
     ├── raw/               # Dados brutos (HarmBench, PINT, JailbreakBench)
     ├── interim/           # Dados intermediários
     └── processed/         # Dataset v0.1 (normalizado)
+
+# PromptShield
+
+Firewall Semântico para prompts maliciosos, com integração ao **Gemini API**.
+
+---
+
+## 📊 Comunicação dos Scripts (Diagramas C4 simplificados)
+
+### Fluxo (Visão Geral)
+```mermaid
+flowchart LR
+  user["Usuário"]
+  api["FastAPI App<br/>(src/infrastructure/web/app.py)"]
+  eng["DecisionEngine<br/>(src/application/decision_engine.py)"]
+  rb["RuleBasedClassifier"]
+  sbert["SBertClassifier"]
+  pol["Policy"]
+  san["LLMSanitizer"]
+  gemcli["GeminiClient"]
+  gem["Gemini API"]
+
+  data["Datasets (data/*)"]
+  models["Modelos (models/*)"]
+  logs["Logs (logs/*)"]
+
+  classDef store fill:#f8fafc,stroke:#64748b,color:#0f172a;
+  class data,models,logs store;
+
+  user -->|"POST /chat"| api
+  api --> eng
+  eng --> rb
+  eng --> sbert
+  eng --> pol
+  pol -->|ALLOW| api
+  pol -->|BLOCK| logs
+  pol -->|SANITIZE| san
+  san --> api
+  api --> gemcli
+  gemcli --> gem
+  gem -->|"texto"| api
+  api -->|"JSON"| user
+
+  sbert -.->|"carrega pesos"| models
+  eng -.->|"scripts offline"| data
+  api -.->|"auditoria"| logs
+
