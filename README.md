@@ -29,7 +29,7 @@ A taxonomia adotada é baseada no **OWASP LLM Top-10 (LLM01 – Prompt Injection
 
 ##Estrutura de Pastas (DDD + Hexagonal)
 
-```bash
+#```bash
 promptshield/
 ├── src/
 │   ├── domain/            # Entidades, enums e ports (núcleo)
