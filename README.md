@@ -39,8 +39,9 @@ promptshield/
     ├── raw/               # Dados brutos (HarmBench, PINT, JailbreakBench)
     ├── interim/           # Dados intermediários
     └── processed/         # Dataset v0.1 (normalizado)
-
+```
 ### Fluxo (Visão Geral)
+```mermaid
   flowchart LR
     user["Usuário"]
     api["FastAPI App\n(src/infrastructure/web/app.py)"]
