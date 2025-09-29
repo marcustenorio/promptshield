@@ -49,11 +49,10 @@ Firewall Semântico para prompts maliciosos, com integração ao **Gemini API**.
 ## 📊 Comunicação dos Scripts (Diagramas C4 simplificados)
 
 ### Fluxo (Visão Geral)
-```mermaid
 flowchart LR
   user["Usuário"]
-  api["FastAPI App<br/>(src/infrastructure/web/app.py)"]
-  eng["DecisionEngine<br/>(src/application/decision_engine.py)"]
+  api["FastAPI App\n(src/infrastructure/web/app.py)"]
+  eng["DecisionEngine\n(src/application/decision_engine.py)"]
   rb["RuleBasedClassifier"]
   sbert["SBertClassifier"]
   pol["Policy"]
