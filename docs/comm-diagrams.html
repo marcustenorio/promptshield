@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <title>PromptShield – Comunicação dos Scripts (Mermaid)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Mermaid UMD (renderiza ao carregar a página) -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    // Renderiza automaticamente todo bloco <div class="mermaid"> na página
+    mermaid.initialize({ startOnLoad: true, theme: "default", securityLevel: "loose" });
+  </script>
+  <style>
+    body{font-family:system-ui,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;margin:24px;line-height:1.4}
+    h1{margin:0 0 8px}
+    .card{border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin:18px 0}
+    .hint{color:#555;font-size:13px;margin-top:6px}
+  </style>
+</head>
+<body>
+  <h1>PromptShield – Comunicação dos Scripts</h1>
+  <p class="hint">Diagramas Mermaid estáticos (renderizam ao abrir o arquivo).</p>
+
+  <!-- FLOWCHART -->
+  <div class="card">
+    <h3>Fluxo (Visão C2/C3 combinadas)</h3>
+    <div class="mermaid">
+flowchart LR
+  %% nós principais (usar sintaxe simples para evitar erros)
+  user["Usuário"]
+  api["FastAPI App<br/>(src/infrastructure/web/app.py)"]
+  eng["DecisionEngine<br/>(src/application/decision_engine.py)"]
+  rb["RuleBasedClassifier<br/>(rule_based_classifier.py)"]
+  sbert["SBertClassifier<br/>(sbert_classifier.py)"]
+  pol["Policy<br/>(policy.py)"]
+  san["LLMSanitizer<br/>(llm_sanitizer.py)"]
+  gemcli["GeminiClient<br/>(gemini_client.py)"]
+  gem["Gemini API<br/>(Google GenAI v1)"]
+
+  data["Datasets<br/>(data/*)"]
+  models["Modelos<br/>(models/*)"]
+  logs["Logs<br/>(logs/*)"]
+
+  classDef store fill:#f8fafc,stroke:#64748b,color:#0f172a;
+  class data,models,logs store;
+
+  %% fluxo principal
+  user -->|"POST /chat"| api
+  api --> eng
+  eng --> rb
+  eng --> sbert
+  eng --> pol
+  pol -->|ALLOW| api
+  pol -->|BLOCK| logs
+  pol -->|SANITIZE| san
+  san --> api
+  api --> gemcli
+  gemcli --> gem
+  gem -->|"texto"| api
+  api -->|"JSON"| user
+
+  %% acessos paralelos
+  sbert -.->|"carrega cabeça/pesos"| models
+  eng -.->|"pode ler (scripts offline)"| data
+  api -.->|"auditoria/métricas"| logs
+    </div>
+    <div class="hint">Pipeline: Usuário → FastAPI (/chat) → DecisionEngine → Classificadores (RuleBased + SBert) → Policy → (SANITIZE?) → GeminiClient → Gemini API → Resposta.</div>
+  </div>
+
+  <!-- SEQUENCE -->
+  <div class="card">
+    <h3>Sequência (/chat)</h3>
+    <div class="mermaid">
+sequenceDiagram
+  autonumber
+  participant U as Usuário
+  participant A as FastAPI (/chat)
+  participant E as DecisionEngine
+  participant R as RuleBased
+  participant S as SBert
+  participant P as Policy
+  participant Z as LLMSanitizer
+  participant G as GeminiClient
+  participant X as Gemini API
+
+  U->>A: POST /chat {message}
+  A->>E: evaluate(message)
+  E->>R: predict(message)
+  R-->>E: AnalysisResult(label/score)
+  E->>S: predict(message)
+  S-->>E: AnalysisResult(label/score)
+  E->>P: decide(votes)
+
+  alt BLOCK
+    P-->>A: decision = BLOCK
+    A-->>U: 403 blocked + análise
+  else SANITIZE
+    P-->>A: decision = SANITIZE
+    A->>Z: sanitize(message)
+    Z-->>A: clean_text
+    A->>G: generate_content(clean_text)
+    G->>X: generateContent()
+    X-->>G: text
+    G-->>A: resposta
+    A-->>U: 200 {firewall, input=clean_text, response}
+  else ALLOW
+    P-->>A: decision = ALLOW
+    A->>G: generate_content(message)
+    G->>X: generateContent()
+    X-->>G: text
+    G-->>A: resposta
+    A-->>U: 200 {firewall, input=message, response}
+  end
+    </div>
+    <div class="hint">Mensagens trocadas no endpoint /chat: classificação, decisão, sanitização (opcional) e chamada ao Gemini.</div>
+  </div>
+
+  <p class="hint">Referência: <a href="https://mermaid.js.org/" target="_blank" rel="noopener">Mermaid</a></p>
+</body>
+</html>
+

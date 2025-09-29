@@ -1,31 +1,27 @@
 @startuml
-!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include ./vendor/C4_Component.puml
 LAYOUT_WITH_LEGEND()
 
 Container_Boundary(api, "FastAPI App (/chat)") {
   Component(handler, "ChatHandler", "app.py", "Recebe request, chama motor, envia resposta.")
   Component(logging, "Logger", "logging_setup.py", "Logs estruturados (JSON).")
 }
-
 Container_Boundary(app, "Camada de Aplicação") {
   Component(engine, "DecisionEngine", "decision_engine.py", "Orquestra classificadores + Policy.")
-  Component(policy, "Policy", "policy.py", "Limiar: SANITIZE/BLOCK; futuras regras por categoria.")
+  Component(policy, "Policy", "policy.py", "Limiar: SANITIZE/BLOCK; regras futuras por categoria.")
   Component(calibration, "Calibração", "calibrate_thresholds.py", "Ajusta thresholds a partir do dataset.")
 }
-
 Container_Boundary(adapters, "Adaptadores") {
-  Component(rb, "RuleBasedClassifier", "rule_based_classifier.py", "Regras/regex para override/exfil.")
-  Component(sbert, "SBertClassifier", "sbert_classifier.py", "Embeddings + cabeça calibrada.")
-  Component(sanit, "LLMSanitizer", "llm_sanitizer.py", "Reescrita/máscara (quando SANITIZE).")
+  Component(rb, "RuleBasedClassifier", "rule_based_classifier.py", "Regras/regex override/exfil.")
+  Component(sbert, "SBertClassifier", "sbert_classifier.py", "Embeddings + classificador calibrado.")
+  Component(sanit, "LLMSanitizer", "llm_sanitizer.py", "Reescrita/máscara quando SANITIZE.")
   Component(gemcli, "GeminiClient", "gemini_client.py", "Chamada ao Gemini (google-genai v1).")
 }
-
 Container_Boundary(data, "Dados/Artefatos") {
   Component(dataset, "Datasets", "data/*", "HarmBench, PINT, JailbreakBench, dataset_v0.1.csv")
   Component(models, "Modelos", "models/*", "Pesos/cabeças treinadas.")
   Component(logs, "Logs", "logs/*", "Auditoria e métricas.")
 }
-
 System_Ext(gemini, "Gemini API (Google GenAI)", "LLM")
 
 Rel(handler, engine, "evaluate(message)")
@@ -37,7 +33,6 @@ Rel(handler, gemcli, "generate_content(clean|raw)")
 Rel(gemcli, gemini, "generateContent()")
 Rel(sbert, models, "carrega pesos/cabeças")
 Rel(handler, logs, "registra allow/sanitize/block + métricas")
-Rel(handler, dataset, "leitura (somente em scripts offline)", "batch")
 
 SHOW_LEGEND()
 @enduml
