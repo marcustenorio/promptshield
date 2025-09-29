@@ -36,3 +36,4 @@
     sbert -.->|"carrega pesos"| models
     eng -.->|"scripts offline"| data
     api -.->|"auditoria"| logs
+```
