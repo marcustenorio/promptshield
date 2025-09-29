@@ -1,11 +1,11 @@
-# 🛡️ PromptShield  
+🛡️ PromptShield  
 
 **PromptShield** é um **firewall semântico para Large Language Models (LLMs)** projetado para detectar e mitigar ataques de **Prompt Injection**.  
 O projeto segue **DDD (Domain-Driven Design)** e **Arquitetura Hexagonal**, garantindo desacoplamento e fácil evolução.  
 
 ---
 
-## Objetivo  
+Objetivo  
 Desenvolver um **middleware de segurança** que:  
 1. Intercepte prompts enviados a LLMs (ChatGPT, Gemini, LLaMA, Mistral etc.).  
 2. Classifique-os como **benignos** ou **maliciosos**.  
@@ -13,7 +13,7 @@ Desenvolver um **middleware de segurança** que:
 
 ---
 
-## Taxonomia Inicial de Ataques  
+Taxonomia Inicial de Ataques  
 
 A taxonomia adotada é baseada no **OWASP LLM Top-10 (LLM01 – Prompt Injection)** e benchmarks internacionais (HarmBench, PINT, JailbreakBench).  
 
