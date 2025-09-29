@@ -29,7 +29,7 @@ A taxonomia adotada é baseada no **OWASP LLM Top-10 (LLM01 – Prompt Injection
 
 ##Estrutura de Pastas (DDD + Hexagonal)
 
-#```bash
+```bash
 promptshield/
 ├── src/
 │   ├── domain/            # Entidades, enums e ports (núcleo)
@@ -40,9 +40,7 @@ promptshield/
     ├── interim/           # Dados intermediários
     └── processed/         # Dataset v0.1 (normalizado)
 
-
 ### Fluxo (Visão Geral)
-```mermaid
   flowchart LR
     user["Usuário"]
     api["FastAPI App\n(src/infrastructure/web/app.py)"]
@@ -78,4 +76,46 @@ promptshield/
     sbert -.->|"carrega pesos"| models
     eng -.->|"scripts offline"| data
     api -.->|"auditoria"| logs
+
+
+  sequenceDiagram
+    autonumber
+    participant U as Usuário
+    participant A as FastAPI (/chat)
+    participant E as DecisionEngine
+    participant R as RuleBased
+    participant S as SBert
+    participant P as Policy
+    participant Z as LLMSanitizer
+    participant G as GeminiClient
+    participant X as Gemini API
+
+    U->>A: POST /chat {message}
+    A->>E: evaluate(message)
+    E->>R: predict(message)
+    R-->>E: AnalysisResult(label/score)
+    E->>S: predict(message)
+    S-->>E: AnalysisResult(label/score)
+    E->>P: decide(votes)
+
+    alt BLOCK
+        P-->>A: decision = BLOCK
+        A-->>U: 403 blocked + análise
+    else SANITIZE
+        P-->>A: decision = SANITIZE
+        A->>Z: sanitize(message)
+        Z-->>A: clean_text
+        A->>G: generate_content(clean_text)
+        G->>X: generateContent()
+        X-->>G: text
+        G-->>A: resposta
+        A-->>U: 200 {firewall, input=clean_text, response}
+    else ALLOW
+        P-->>A: decision = ALLOW
+        A->>G: generate_content(message)
+        G->>X: generateContent()
+        X-->>G: text
+        G-->>A: resposta
+        A-->>U: 200 {firewall, input=message, response}
+    end
 ```
