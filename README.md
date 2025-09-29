@@ -41,7 +41,6 @@ promptshield/
     └── processed/         # Dataset v0.1 (normalizado)
 ```
 ### Fluxo (Visão Geral)
-### Fluxo (Visão Geral)
 ```mermaid
 flowchart LR
   user["Usuário"]
